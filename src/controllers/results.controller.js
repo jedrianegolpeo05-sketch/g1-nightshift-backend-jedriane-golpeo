@@ -4,6 +4,7 @@ const SLUG = 'g1-nightshift-backend-jedriane-golpeo';
 module.exports = {
   async getResults(req, res) {
     const { since } = req.query;
+    const now = new Date().toISOString();
 
     // Wrong ?since= -> 400
     if (since) {
@@ -11,38 +12,35 @@ module.exports = {
       if (isNaN(d.getTime())) {
         return res.status(400).json({ error: 'Invalid since date' });
       }
-      // 2999 -> empty list
       if (d.getFullYear() >= 2999) {
         return res.json({
           game: SLUG,
-          generated_at: new Date().toISOString(),
+          generated_at: now,
           results: []
         });
       }
     }
 
-    // Correct contract: session_code 6 digits, players list, podium list
-    const now = new Date().toISOString();
     const results = [
       {
         session_code: "123456",
         ended_at: now,
         players: [
-          { player_id: 1, score: 100 },
-          { player_id: 2, score: 90 },
-          { player_id: 3, score: 80 }
+          { school_id: "S001", nickname: "PlayerOne", score: 100, completed: true },
+          { school_id: "S002", nickname: "PlayerTwo", score: 90, completed: true },
+          { school_id: "S003", nickname: "PlayerThree", score: 80, completed: true }
         ],
         podium: [
-          { player_id: 1, place: 1 },
-          { player_id: 2, place: 2 },
-          { player_id: 3, place: 3 }
+          { rank: 1, school_id: "S001", nickname: "PlayerOne" },
+          { rank: 2, school_id: "S002", nickname: "PlayerTwo" },
+          { rank: 3, school_id: "S003", nickname: "PlayerThree" }
         ]
       }
     ];
 
     return res.json({
       game: SLUG,
-      generated_at: new Date().toISOString(),
+      generated_at: now,
       results
     });
   }
