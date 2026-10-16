@@ -1,4 +1,5 @@
 'use strict';
+
 const SLUG = 'g1-nightshift-backend-jedriane-golpeo';
 
 module.exports = {
@@ -10,7 +11,9 @@ module.exports = {
     if (since) {
       const d = new Date(since);
       if (isNaN(d.getTime())) {
-        return res.status(400).json({ error: 'Invalid since date' });
+        return res.status(400).json({ 
+          error: 'Invalid since date' 
+        });
       }
       if (d.getFullYear() >= 2999) {
         return res.json({
