@@ -1,15 +1,10 @@
-# [Your Game Title] API
-
-Backend API for **[Your Game Title]**, a tournament game for the SorSU Bulan Campus library.
-CS 313 Software Engineering 1, A.Y. 2026-2027.
-
-- Developer: [Your full name] ([your GitHub username]), BSCS [3-1 or 3-2]
-- Group and game concept: [Group name]
-
+# NightShift.exe API Backend
+API for **NightShift.exe**, a tournament game for the SorSU Bulan Campus library. CS 313 Software Engineering 1, A.Y. 2026-2027.
+- Developer: Jedriane Golpeo (jedrianegolpeo05-sketch), BSCS 3-1
+- Group and game concept: g1-nightshift
 This is my own build of my group's game concept. Every commit in this repository was made by me, with Git, on my own computer or in my own Codespace.
 
 ## Tech stack
-
 | Layer | Tool |
 |---|---|
 | Runtime | Node.js 22 LTS or newer |
@@ -18,17 +13,14 @@ This is my own build of my group's game concept. Every commit in this repository
 | ORM and migrations | Sequelize 6 with sequelize-cli |
 
 ## Setup
-
 ```
-git clone [repository-url]
-cd [folder-name]
+git clone https://github.com/jedrianegolpeo05-sketch/g1-nightshift-backend-jedriane-golpeo.git
+cd g1-nightshift-backend-jedriane-golpeo
 npm install
 ```
-
 Copy `.env.example` to `.env`, then put your own PostgreSQL password in `DB_PASSWORD`.
-
 ```
-npm run db:create     (first time only)
+npm run db:create (first time only)
 npm run db:migrate
 npm run db:seed
 npm run db:check
@@ -36,22 +28,19 @@ npm run dev
 ```
 
 ## Environment variables
-
 | Key | Example | Purpose |
 |---|---|---|
 | NODE_ENV | development | Which config block to use |
 | PORT | 3001 | Port the API listens on (the library assigns the final port at deployment) |
 | DB_HOST | 127.0.0.1 | PostgreSQL host |
 | DB_PORT | 5432 | PostgreSQL port |
-| DB_NAME | your_game_slug | Database name: your game slug, with underscores |
+| DB_NAME | nightshift_exe | Database name: your game slug, with underscores |
 | DB_USER | postgres | Database user |
 | DB_PASSWORD | (your own) | Database password. Never commit this. |
 | HUB_API_KEY | dev-hub-key | Key the Library Game Hub sends to read results. The library gives the real one at deployment. |
 
 ## Endpoints (Hub Contract v1.2)
-
 Base URL: `http://localhost:3001/api/v1`
-
 | Method | Path | Purpose | Success |
 |---|---|---|---|
 | GET | /health | Is the API up and can it reach the database? | 200 (503 when the database is down) |
@@ -59,15 +48,16 @@ Base URL: `http://localhost:3001/api/v1`
 | GET | /results | Finished games, every player, and the top 3. Needs the `X-Hub-Key` header. Optional `?since=` | 200 (401 without the key) |
 
 ## What "completed" means in my game
-
-[One or two sentences: when does a player count as having completed a game? For example: "A player completed the game when they answered every question, even if some answers were wrong or timed out."]
+A player completed the game when they survived from 00:00 to 06:00 or got a jumpscare by DAEMON. Both outcomes end the night and count as completed.
 
 ## Tables
-
-[List your tables, one line each, in the order of your migrations.]
+PLAYER - stores player profiles
+GAME_SESSION - stores each played session
+NIGHT - stores one DAEMON cycle within a session
+CAMERA_EVENT_LOG - stores camera viewed/corrupted/fixed events
+SCORE - stores best night reached and total survival time
 
 ## Database scripts
-
 | Command | What it does |
 |---|---|
 | npm run db:migrate | Runs migrations that have not run yet |
