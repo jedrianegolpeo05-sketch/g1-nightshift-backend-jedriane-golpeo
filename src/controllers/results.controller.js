@@ -1,22 +1,19 @@
 'use strict';
 const SLUG = 'g1-nightshift-backend-jedriane-golpeo';
-
 function isValidSince(v) {
   if (!v || typeof v!== 'string') return false;
   v = v.trim();
   if (!v) return false;
   const d = new Date(v);
   if (isNaN(d.getTime()) || isNaN(Date.parse(v))) return false;
-  // check Feb 30 etc
   const m = v.match(/^(\d{4})-(\d{2})-(\d{2})/);
   if (m) {
     const y = +m[1], mo = +m[2], da = +m[3];
-    const check = new Date(Date.UTC(y, mo-1, da));
-    if (check.getUTCFullYear()!== y || check.getUTCMonth()+1!== mo || check.getUTCDate()!== da) return false;
+    const check = new Date(Date.UTC(y, mo - 1, da));
+    if (check.getUTCFullYear()!== y || check.getUTCMonth() + 1!== mo || check.getUTCDate()!== da) return false;
   }
   return true;
 }
-
 module.exports = {
   async getResults(req, res) {
     const now = new Date().toISOString();
@@ -24,15 +21,10 @@ module.exports = {
     if (raw!== undefined) {
       const v = Array.isArray(raw)? raw[0] : raw;
       if (!isValidSince(v)) {
-        return res.status(400).json({
-          error: {
-            code: 'INVALID_SINCE',
-            message: 'Invalid since parameter'
-          }
-        });
+        return res.status(400).json({ error: { code: 'INVALID_SINCE', message: 'Invalid since parameter' } });
       }
-      const date = new Date(v);
-      if (date.getFullYear() >= 2999) {
+      const sinceDate = new Date(v);
+      if (sinceDate > new Date()) {
         return res.json({ game: SLUG, generated_at: now, results: [] });
       }
     }
