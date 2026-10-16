@@ -1,20 +1,26 @@
 'use strict';
-const gameInfo = require('../config/game-info');
-const resultsRepo = require('../repositories/results.repository');
+const resultsService = require('../services/results.service');
+const SLUG = 'g1-nightshift-backend-jedriane-golpeo';
 
 module.exports = {
-  getResults: async (req, res, next) => {
+  async getResults(req, res) {
     try {
-      const since = req.query.since;
-      const results = await resultsRepo.findFinishedGamePlayers(since);
-
+      const { since } = req.query;
+      if (since) {
+        const d = new Date(since);
+        if (isNaN(d.getTime())) {
+          return res.status(400).json({ error: 'Invalid since date' });
+        }
+      }
+      const results = await resultsService.getFinishedResults(since);
       return res.json({
-        game: gameInfo.slug,
+        game: SLUG,
         generated_at: new Date().toISOString(),
-        results: results
+        results
       });
     } catch (err) {
-      next(err);
+      console.error(err);
+      return res.status(500).json({ error: 'Internal error' });
     }
   }
 };
