@@ -1,7 +1,7 @@
 {
-  "name": "your-game-api",
+  "name": "g1-nightshift-backend-jedriane-golpeo",
   "version": "1.0.0",
-  "description": "CHANGE_ME - one sentence about your game (CS 313 Software Engineering 1)",
+  "description": "A survival-horror browser game played entirely through draggable desktop windows and a live command-line terminal - CS 313 Software Engineering 1",
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
@@ -19,7 +19,7 @@
   "engines": {
     "node": ">=22"
   },
-  "author": "CHANGE_ME - your full name",
+  "author": "Jedriane Golpeo",
   "license": "ISC",
   "dependencies": {
     "dotenv": "^18.0.7",
