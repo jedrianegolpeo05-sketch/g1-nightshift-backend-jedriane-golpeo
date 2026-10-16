@@ -1,9 +1,12 @@
+'use strict';
 module.exports = {
-  getGameInfo: () => ({
-    slug: "nightshift-exe",
-    name: "NightShift.exe",
-    team: "g1-nightshift",
-    developer: "jedrianegolpeo05-sketch",
-    description: "A survival-horror browser game played entirely through draggable desktop windows and a live command-line terminal."
-  })
+  getGameInfo: () => {
+    return {
+      slug: 'g1-nightshift-backend-jedriane-golpeo',
+      name: 'G1 Nightshift Backend',
+      team: 'g1-nightshift',
+      developer: 'jedrianegolpeo05-sketch',
+      description: 'Nightshift backend for G1 - Jedriane Golpeo'
+    };
+  }
 };
