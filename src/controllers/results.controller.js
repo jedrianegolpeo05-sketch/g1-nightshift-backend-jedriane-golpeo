@@ -5,12 +5,18 @@ module.exports = {
   async getResults(req, res) {
     const now = new Date().toISOString();
 
-    if (req.query.since !== undefined) {
-      const v = req.query.since;
-      if (!v || Number.isNaN(Date.parse(v))) {
+    if (req.query.since!== undefined) {
+      const raw = req.query.since;
+      const v = Array.isArray(raw)? raw[0] : raw;
+
+      // Strict: empty, no dash, or not a real date -> 400
+      const d = new Date(v);
+      const isValid = v && typeof v === 'string' && v.includes('-') &&!isNaN(d.getTime()) &&!isNaN(Date.parse(v));
+
+      if (!isValid) {
         return res.status(400).json({ error: 'Invalid since parameter' });
       }
-      const d = new Date(v);
+
       if (d.getFullYear() >= 2999) {
         return res.json({ game: SLUG, generated_at: now, results: [] });
       }
