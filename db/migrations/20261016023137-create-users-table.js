@@ -7,6 +7,7 @@ module.exports = {
       school_id: { type: Sequelize.STRING, allowNull: false },
       full_name: { type: Sequelize.STRING, allowNull: false },
       role: { type: Sequelize.STRING, allowNull: false },
+      email: { type: Sequelize.STRING, allowNull: false },
       created_at: { allowNull: false, type: Sequelize.DATE, defaultValue: Sequelize.fn('NOW') },
       updated_at: { allowNull: false, type: Sequelize.DATE, defaultValue: Sequelize.fn('NOW') }
     });
