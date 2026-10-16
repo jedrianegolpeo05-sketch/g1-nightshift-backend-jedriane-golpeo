@@ -4,17 +4,19 @@ const SLUG = 'g1-nightshift-backend-jedriane-golpeo';
 
 module.exports = {
   async getResults(req, res) {
-    const { since } = req.query;
     const now = new Date().toISOString();
 
-    // Wrong ?since= -> 400
-    if (since) {
-      const d = new Date(since);
-      if (isNaN(d.getTime())) {
-        return res.status(400).json({ 
-          error: 'Invalid since date' 
-        });
+    // Check if ?since= exists (kahit empty)
+    if (Object.prototype.hasOwnProperty.call(req.query, 'since')) {
+      const sinceVal = req.query.since;
+      const d = new Date(sinceVal);
+
+      // Empty or invalid date -> 400
+      if (!sinceVal || isNaN(d.getTime())) {
+        return res.status(400).json({ error: 'Invalid since parameter' });
       }
+
+      // Year 2999 -> empty list
       if (d.getFullYear() >= 2999) {
         return res.json({
           game: SLUG,
