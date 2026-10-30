@@ -1,25 +1,17 @@
-const { QuestionSet } = require('../models');
+const { Router } = require('express');
+const controller = require('../controllers/question-set.controller');
+const rules = require('../validators/question-set.validator');
+const validate = require('../middlewares/validate');
+const requireUser = require('../middlewares/require-user');
 
-exports.findAll = async () => {
-  return await QuestionSet.findAll();
-};
+const router = Router();
 
-exports.findById = async (id) => {
-  return await QuestionSet.findByPk(id);
-};
+router.use(requireUser('HOST', 'ADMIN'));
 
-exports.create = async (data) => {
-  return await QuestionSet.create(data);
-};
+router.get('/', controller.list);
+router.post('/', rules.createRules, validate, controller.create);
+router.get('/:id', rules.idParam, validate, controller.get);
+router.patch('/:id', rules.updateRules, validate, controller.update);
+router.delete('/:id', rules.idParam, validate, controller.remove);
 
-exports.update = async (id, data) => {
-  const item = await QuestionSet.findByPk(id);
-  if (!item) return null;
-  return await item.update(data);
-};
-
-exports.delete = async (id) => {
-  const item = await QuestionSet.findByPk(id);
-  if (!item) return null;
-  return await item.destroy();
-};
+module.exports = router;
