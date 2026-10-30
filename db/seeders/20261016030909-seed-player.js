@@ -1,6 +1,7 @@
 'use strict';
 module.exports = {
   async up(queryInterface) {
+    await queryInterface.bulkDelete('GAME_SESSION', null, {});
     await queryInterface.bulkDelete('PLAYER', null, {});
     await queryInterface.bulkInsert('PLAYER', [
       { id: 1, player_name: 'Player1', created_at: new Date(), updated_at: new Date() },
@@ -9,6 +10,7 @@ module.exports = {
     ]);
   },
   async down(queryInterface) {
+    await queryInterface.bulkDelete('GAME_SESSION', null, {});
     await queryInterface.bulkDelete('PLAYER', null, {});
   }
 };
