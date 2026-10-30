@@ -1,19 +1,14 @@
 'use strict';
 module.exports = {
-  async up(queryInterface) {
-    await queryInterface.bulkDelete('users', null, {});
-    await queryInterface.bulkInsert('users', [{
-      id: 1,
-      user_id: 'U001',
-      school_id: 'S001',
-      full_name: 'Jedriane Golpeo',
-      role: 'player',
-      email: 'jedriane@example.com',
-      created_at: new Date(),
-      updated_at: new Date()
-    }]);
+  async up(q) {
+    await q.bulkDelete('seat', null, {});
+    await q.bulkDelete('USERS', null, {});
+    await q.bulkInsert('USERS', [
+      { id: 1, username: 'host1', password_hash: 'test', created_at: new Date(), updated_at: new Date() }
+    ]);
   },
-  async down(queryInterface) {
-    await queryInterface.bulkDelete('users', null, {});
+  async down(q) {
+    await q.bulkDelete('seat', null, {});
+    await q.bulkDelete('USERS', null, {});
   }
 };
