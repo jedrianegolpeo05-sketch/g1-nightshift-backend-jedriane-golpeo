@@ -1,21 +1,26 @@
-// ONE Sequelize instance (one connection pool) for the whole API.
-// Every other file imports it from here - nobody opens a second one.
+'use strict';
 const { Sequelize, DataTypes } = require('sequelize');
 const env = require('../config/env');
-const dbConfig = require('../config/database')[env.nodeEnv];
 
-const sequelize = new Sequelize(
-  dbConfig.database,
-  dbConfig.username,
-  dbConfig.password,
-  dbConfig
-);
+const sequelize = new Sequelize(env.DB_NAME, env.DB_USER, env.DB_PASSWORD, {
+  host: env.DB_HOST,
+  port: env.DB_PORT,
+  dialect: env.DB_DIALECT || 'postgres',
+  logging: false
+});
 
-// Week 11: load your models here, one line each, then add their associations.
-// Example:
-//   const User = require('./user')(sequelize, DataTypes);
-//   const Player = require('./player')(sequelize, DataTypes);
-//   User.hasMany(Player, { foreignKey: 'user_id' });
-//   Player.belongsTo(User, { foreignKey: 'user_id' });
+const db = {};
+const QuestionSet = require('./question-set')(sequelize, DataTypes);
+const User = require('./user')(sequelize, DataTypes);
 
-module.exports = { sequelize, Sequelize, DataTypes };
+db.QuestionSet = QuestionSet;
+db.User = User;
+
+if (User.associate) User.associate(db);
+if (QuestionSet.associate) QuestionSet.associate(db);
+
+db.sequelize = sequelize;
+db.Sequelize = Sequelize;
+db.DataTypes = DataTypes;
+
+module.exports = db;
