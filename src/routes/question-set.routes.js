@@ -1,33 +1,13 @@
-const { Router } = require('express');
-const controller = require('../controllers/question-set.controller');
-const validator = require('../validators/question-set.validator');
-const validate = require('../middlewares/validate');
-const requireUser = require('../middlewares/require-user');
-
-const router = Router();
-
-router.get('/', controller.list);
-router.get('/:id', validator.id, validate, controller.getOne);
-
-router.post('/', 
-  requireUser('admin', 'ADMIN'), 
-  validator.create, 
-  validate, 
-  controller.create
-);
-
-router.put('/:id', 
-  requireUser('admin', 'ADMIN'), 
-  validator.update, 
-  validate, 
-  controller.update
-);
-
-router.delete('/:id', 
-  requireUser('admin', 'ADMIN'), 
-  validator.id, 
-  validate, 
-  controller.delete
-);
-
+const { Router } = require('express'); 
+const controller = require('../controllers/question-set.controller'); 
+const rules = require('../validators/question-set.validator'); 
+const validate = require('../middlewares/validate'); 
+const requireUser = require('../middlewares/require-user'); 
+const router = Router(); 
+router.use(requireUser('HOST', 'ADMIN')); 
+router.get('/', controller.list); 
+router.post('/', rules.create, validate, controller.create); 
+router.get('/:id', rules.id, validate, controller.getOne); 
+router.patch('/:id', rules.update, validate, controller.update); 
+router.delete('/:id', rules.id, validate, controller.delete); 
 module.exports = router;

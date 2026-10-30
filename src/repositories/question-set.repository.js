@@ -1,17 +1,37 @@
-const { Router } = require('express');
-const controller = require('../controllers/question-set.controller');
-const rules = require('../validators/question-set.validator');
-const validate = require('../middlewares/validate');
-const requireUser = require('../middlewares/require-user');
+const { sequelize } = require('../models');
 
-const router = Router();
+function getModel() {
+  return sequelize.models.QuestionSet || sequelize.models.question_sets || sequelize.models.QuestionSets;
+}
 
-router.use(requireUser('HOST', 'ADMIN'));
+async function list() {
+  const Model = getModel();
+  return Model.findAll();
+}
 
-router.get('/', controller.list);
-router.post('/', rules.createRules, validate, controller.create);
-router.get('/:id', rules.idParam, validate, controller.get);
-router.patch('/:id', rules.updateRules, validate, controller.update);
-router.delete('/:id', rules.idParam, validate, controller.remove);
+async function getById(id) {
+  const Model = getModel();
+  return Model.findByPk(id);
+}
 
-module.exports = router;
+async function create(data) {
+  const Model = getModel();
+  return Model.create(data);
+}
+
+async function update(id, data) {
+  const Model = getModel();
+  const row = await Model.findByPk(id);
+  if (!row) return null;
+  return row.update(data);
+}
+
+async function remove(id) {
+  const Model = getModel();
+  const row = await Model.findByPk(id);
+  if (!row) return 0;
+  await row.destroy();
+  return 1;
+}
+
+module.exports = { list, getById, create, update, remove };
