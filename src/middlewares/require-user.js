@@ -6,8 +6,12 @@ const { unauthorized, forbidden } = require('../errors/app-error');
 function requireUser(...roles) {
   return function guard(req, res, next) {
     if (!req.user) throw unauthorized();
-    if (roles.length > 0 && !roles.includes(req.user.role)) {
-      throw forbidden(`Only these roles may do this: ${roles.join(', ')}.`);
+    if (roles.length > 0) {
+      const userRole = String(req.user.role || '').toUpperCase();
+      const allowed = roles.map(r => String(r).toUpperCase());
+      if (!allowed.includes(userRole)) {
+        throw forbidden(`Only these roles may do this: ${roles.join(', ')}.`);
+      }
     }
     next();
   };

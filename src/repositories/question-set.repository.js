@@ -1,37 +1,22 @@
-const { sequelize } = require('../models');
-
-function getModel() {
-  return sequelize.models.QuestionSet || sequelize.models.question_sets || sequelize.models.QuestionSets;
-}
-
-async function list() {
-  const Model = getModel();
-  return Model.findAll();
-}
-
-async function getById(id) {
-  const Model = getModel();
-  return Model.findByPk(id);
-}
-
-async function create(data) {
-  const Model = getModel();
-  return Model.create(data);
-}
-
-async function update(id, data) {
-  const Model = getModel();
-  const row = await Model.findByPk(id);
-  if (!row) return null;
-  return row.update(data);
-}
-
-async function remove(id) {
-  const Model = getModel();
-  const row = await Model.findByPk(id);
-  if (!row) return 0;
-  await row.destroy();
-  return 1;
-}
-
-module.exports = { list, getById, create, update, remove };
+const { QuestionSet, Question } = require('../models');
+exports.list = async () => QuestionSet.findAll({ order: [['id','ASC']] });
+exports.getById = async (id) => QuestionSet.findByPk(id);
+exports.create = async (body, user) => QuestionSet.create({
+  title: body.title, description: body.description, category: body.category,
+  difficulty_level: body.difficulty_level?.toLowerCase() || 'easy',
+  total_items: body.total_items || 10, time_limit_minutes: body.time_limit_minutes || 15,
+  is_active: body.is_active ?? true, created_by: user.id, school_id: user.school_id || null
+});
+exports.update = async (id, body) => {
+  const r = await QuestionSet.findByPk(id);
+  if (!r) return null;
+  if (body.difficulty_level) body.difficulty_level = body.difficulty_level.toLowerCase();
+  return r.update(body);
+};
+exports.delete = async (id) => {
+  const r = await QuestionSet.findByPk(id);
+  if (!r) return null; await r.destroy(); return r;
+};
+exports.addQuestion = async (setId, payload) => {
+  return Question.create({ ...payload, question_set_id: setId });
+};

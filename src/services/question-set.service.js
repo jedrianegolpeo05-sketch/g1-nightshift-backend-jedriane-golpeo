@@ -1,39 +1,30 @@
 const repo = require('../repositories/question-set.repository');
 
-exports.list = async () => {
-  return repo.findAll();
-};
-
+exports.list = async () => repo.list();
 exports.getOne = async (id) => {
-  const item = await repo.findById(id);
-  if (!item) {
-    const err = new Error('QuestionSet not found');
-    err.status = 404;
-    throw err;
+  const data = await repo.getById(id);
+  if (!data) { const e = new Error('Question set not found'); e.status = 404; throw e; }
+  return data;
+};
+exports.create = async (body, user) => repo.create(body, user);
+exports.update = async (id, body, user) => {
+  const data = await repo.getById(id);
+  if (!data) { const e = new Error('Question set not found'); e.status = 404; throw e; }
+  if (data.host_id !== user.id && user.role !== 'ADMIN') {
+    const e = new Error('This question set belongs to another host.'); e.status = 403; e.code = 'FORBIDDEN'; throw e;
   }
-  return item;
-};
-
-exports.create = async (body, user) => {
-  const data = {
-    title: body.title,
-    description: body.description,
-    category: body.category,
-    difficulty_level: body.difficulty_level,
-    total_items: body.total_items,
-    time_limit_minutes: body.time_limit_minutes,
-    is_active: body.is_active,
-    created_by: user ? user.id : null
-  };
-  return repo.create(data);
-};
-
-exports.update = async (id, body) => {
-  await exports.getOne(id);
   return repo.update(id, body);
 };
-
-exports.delete = async (id) => {
-  await exports.getOne(id);
+exports.delete = async (id, user) => {
+  const data = await repo.getById(id);
+  if (!data) { const e = new Error('Question set not found'); e.status = 404; throw e; }
+  if (data.host_id !== user.id && user.role !== 'ADMIN') {
+    const e = new Error('This question set belongs to another host.'); e.status = 403; e.code = 'FORBIDDEN'; throw e;
+  }
   return repo.delete(id);
+};
+exports.addQuestion = async (setId, payload, user) => {
+  const data = await repo.getById(setId);
+  if (!data) { const e = new Error('Question set not found'); e.status = 404; throw e; }
+  return repo.addQuestion(setId, payload);
 };
