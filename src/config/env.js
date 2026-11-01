@@ -1,25 +1,11 @@
-// Loads .env once and fails fast when a required key is missing.
-require('dotenv').config({ quiet: true });
-
-const REQUIRED = ['DB_HOST', 'DB_PORT', 'DB_NAME', 'DB_USER', 'DB_PASSWORD', 'HUB_API_KEY'];
-const missing = REQUIRED.filter((key) => !process.env[key]);
-
-if (missing.length > 0) {
-  throw new Error(
-    `Missing required .env keys: ${missing.join(', ')}. ` +
-      'Copy .env.example to .env and fill in your own values.'
-  );
-}
-
-module.exports = {
-  nodeEnv: process.env.NODE_ENV || 'development',
-  port: Number(process.env.PORT) || 3001,
-  hubApiKey: process.env.HUB_API_KEY,
-  db: {
-    host: process.env.DB_HOST,
-    port: Number(process.env.DB_PORT),
-    name: process.env.DB_NAME,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-  },
-};
+require('dotenv').config();
+process.env.DB_HOST = process.env.DB_HOST || '127.0.0.1';
+process.env.DB_PORT = process.env.DB_PORT || '5432';
+process.env.DB_NAME = process.env.DB_NAME || 'nightshift_db';
+process.env.DB_USER = process.env.DB_USER || 'postgres';
+process.env.DB_PASSWORD = process.env.DB_PASSWORD || 'postgres';
+process.env.DB_DIALECT = process.env.DB_DIALECT || 'postgres';
+process.env.HUB_API_KEY = process.env.HUB_API_KEY || 'dev-hub-key';
+process.env.PORT = process.env.PORT || '3001';
+process.env.NODE_ENV = process.env.NODE_ENV || 'development';
+module.exports = process.env;

@@ -1,0 +1,92 @@
+@'
+{
+  "info": {
+    "name": "G1 Nightshift - Week 11",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {"key": "baseUrl", "value": "http://localhost:3001/api/v1"},
+    {"key": "host", "value": "2099-0001"},
+    {"key": "otherHost", "value": "2099-0003"},
+    {"key": "player", "value": "2099-0002"},
+    {"key": "setId", "value": ""}
+  ],
+  "item": [
+    {
+      "name": "question-sets",
+      "item": [
+        {
+          "name": "1-Create Valid",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "X-Demo-User", "value": "{{host}}"}, {"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"title\": \"Philippine Literature\",\n  \"subject\": \"Filipino\",\n  \"is_public\": false\n}"},
+            "url": "{{baseUrl}}/question-sets"
+          },
+          "event": [{"listen": "test", "script": {"exec": ["pm.test(\"status is 201\", function () { pm.response.to.have.status(201); });", "pm.collectionVariables.set(\"setId\", pm.response.json().id || pm.response.json().set_id);"], "type": "text/javascript"}}]
+        },
+        {
+          "name": "2-Field Wrong",
+          "request": {"method": "POST", "header": [{"key": "X-Demo-User", "value": "{{host}}"}, {"key": "Content-Type", "value": "application/json"}], "body": {"mode": "raw", "raw": "{\n  \"title\": \"ab\",\n  \"subject\": 123\n}"}, "url": "{{baseUrl}}/question-sets"},
+          "event": [{"listen": "test", "script": {"exec": ["pm.test(\"status is 400\", function () { pm.response.to.have.status(400); });"], "type": "text/javascript"}}]
+        },
+        {
+          "name": "3-Broken JSON",
+          "request": {"method": "POST", "header": [{"key": "X-Demo-User", "value": "{{host}}"}, {"key": "Content-Type", "value": "application/json"}], "body": {"mode": "raw", "raw": "{\"title\": \"test\""}, "url": "{{baseUrl}}/question-sets"},
+          "event": [{"listen": "test", "script": {"exec": ["pm.test(\"status is 400\", function () { pm.response.to.have.status(400); });"], "type": "text/javascript"}}]
+        },
+        {
+          "name": "4-Nobody",
+          "request": {"method": "GET", "url": "{{baseUrl}}/question-sets"},
+          "event": [{"listen": "test", "script": {"exec": ["pm.test(\"status is 401\", function () { pm.response.to.have.status(401); });"], "type": "text/javascript"}}]
+        },
+        {
+          "name": "5-Wrong Role",
+          "request": {"method": "GET", "header": [{"key": "X-Demo-User", "value": "{{player}}"}], "url": "{{baseUrl}}/question-sets"},
+          "event": [{"listen": "test", "script": {"exec": ["pm.test(\"status is 403\", function () { pm.response.to.have.status(403); });"], "type": "text/javascript"}}]
+        },
+        {
+          "name": "6-List",
+          "request": {"method": "GET", "header": [{"key": "X-Demo-User", "value": "{{host}}"}], "url": "{{baseUrl}}/question-sets"},
+          "event": [{"listen": "test", "script": {"exec": ["pm.test(\"status is 200\", function () { pm.response.to.have.status(200); });"], "type": "text/javascript"}}]
+        },
+        {
+          "name": "7-Read One",
+          "request": {"method": "GET", "header": [{"key": "X-Demo-User", "value": "{{host}}"}], "url": "{{baseUrl}}/question-sets/{{setId}}"},
+          "event": [{"listen": "test", "script": {"exec": ["pm.test(\"status is 200\", function () { pm.response.to.have.status(200); });"], "type": "text/javascript"}}]
+        },
+        {
+          "name": "8-Not Exist",
+          "request": {"method": "GET", "header": [{"key": "X-Demo-User", "value": "{{host}}"}], "url": "{{baseUrl}}/question-sets/9999"},
+          "event": [{"listen": "test", "script": {"exec": ["pm.test(\"status is 404\", function () { pm.response.to.have.status(404); });"], "type": "text/javascript"}}]
+        },
+        {
+          "name": "9-Id Not Number",
+          "request": {"method": "GET", "header": [{"key": "X-Demo-User", "value": "{{host}}"}], "url": "{{baseUrl}}/question-sets/abc"},
+          "event": [{"listen": "test", "script": {"exec": ["pm.test(\"status is 400\", function () { pm.response.to.have.status(400); });"], "type": "text/javascript"}}]
+        },
+        {
+          "name": "10-Update",
+          "request": {"method": "PATCH", "header": [{"key": "X-Demo-User", "value": "{{host}}"}, {"key": "Content-Type", "value": "application/json"}], "body": {"mode": "raw", "raw": "{\n  \"title\": \"Philippine Literature 101\"\n}"}, "url": "{{baseUrl}}/question-sets/{{setId}}"},
+          "event": [{"listen": "test", "script": {"exec": ["pm.test(\"status is 200\", function () { pm.response.to.have.status(200); });"], "type": "text/javascript"}}]
+        },
+        {
+          "name": "11-Not Owner",
+          "request": {"method": "PATCH", "header": [{"key": "X-Demo-User", "value": "{{otherHost}}"}, {"key": "Content-Type", "value": "application/json"}], "body": {"mode": "raw", "raw": "{\n  \"title\": \"Hacked\"\n}"}, "url": "{{baseUrl}}/question-sets/{{setId}}"},
+          "event": [{"listen": "test", "script": {"exec": ["pm.test(\"status is 403\", function () { pm.response.to.have.status(403); });"], "type": "text/javascript"}}]
+        },
+        {
+          "name": "12-Nothing to Change",
+          "request": {"method": "PATCH", "header": [{"key": "X-Demo-User", "value": "{{host}}"}, {"key": "Content-Type", "value": "application/json"}], "body": {"mode": "raw", "raw": "{}"}, "url": "{{baseUrl}}/question-sets/{{setId}}"},
+          "event": [{"listen": "test", "script": {"exec": ["pm.test(\"status is 400\", function () { pm.response.to.have.status(400); });"], "type": "text/javascript"}}]
+        },
+        {
+          "name": "13-Delete",
+          "request": {"method": "DELETE", "header": [{"key": "X-Demo-User", "value": "{{host}}"}], "url": "{{baseUrl}}/question-sets/{{setId}}"},
+          "event": [{"listen": "test", "script": {"exec": ["pm.test(\"status is 204\", function () { pm.response.to.have.status(204); });"], "type": "text/javascript"}}]
+        }
+      ]
+    }
+  ]
+}
+'@ | Out-File -Encoding utf8 postman\G1_Nightshift_Week11.postman_collection.json
