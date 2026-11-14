@@ -1,13 +1,27 @@
-// A database rule was broken -> what the client should hear.
-// The key is the constraint name from YOUR migration. PostgreSQL names a
-// foreign key "<table>_<column>_fkey" when the migration does not name it.
-// Write one entry for each constraint a client can hit. Example:
-//
-//   uq_player_nickname: {
-//     status: 409,
-//     code: 'NICKNAME_TAKEN',
-//     message: 'That nickname is already used in this game.',
-//   },
-//
-// A constraint that is not listed here still answers 409, with the code CONFLICT.
-module.exports = {};
+module.exports = {
+  game_sessions_join_pin_key: {
+    status: 409,
+    code: 'JOIN_PIN_TAKEN',
+    message: 'That join pin is already used by another game.',
+  },
+  unique_game_user: {
+    status: 409,
+    code: 'ALREADY_JOINED',
+    message: 'You have already joined this game.',
+  },
+  users_user_id_key: {
+    status: 409,
+    code: 'USER_ID_TAKEN',
+    message: 'That user ID is already taken.',
+  },
+  seat_user_id_fkey: {
+    status: 409,
+    code: 'USER_IN_USE',
+    message: 'This user is still in a game and cannot be deleted.',
+  },
+  GAME_SESSION_player_id_fkey: {
+    status: 409,
+    code: 'PLAYER_IN_USE',
+    message: 'This player is still in a game and cannot be deleted.',
+  },
+};
