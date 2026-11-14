@@ -1,11 +1,39 @@
-// The only layer that talks to the database.
-// Week 7 showed a repository holding raw SQL. With Sequelize, a repository
-// calls the models (or the shared connection) instead. It is still the
-// only door to the data: services call repositories, never the database.
 const { sequelize } = require('../models');
 
-async function ping() {
-  await sequelize.authenticate();
+function getModel() {
+  return sequelize.models.QuestionSet || 
+         sequelize.models.question_sets || 
+         sequelize.models.QuestionSets;
 }
 
-module.exports = { ping };
+async function list() {
+  const Model = getModel();
+  return Model.findAll();
+}
+
+async function getById(id) {
+  const Model = getModel();
+  return Model.findByPk(id);
+}
+
+async function create(data) {
+  const Model = getModel();
+  return Model.create(data);
+}
+
+async function update(id, data) {
+  const Model = getModel();
+  const row = await Model.findByPk(id);
+  if (!row) return null;
+  return row.update(data);
+}
+
+async function remove(id) {
+  const Model = getModel();
+  const row = await Model.findByPk(id);
+  if (!row) return 0;
+  await row.destroy();
+  return 1;
+}
+
+module.exports = { list, getById, create, update, remove };
