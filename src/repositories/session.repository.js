@@ -10,7 +10,7 @@ exports.getByCode = async (code) => Session.findOne({ where: { join_pin: code } 
 
 exports.create = async (body, user) => {
   if (!body) body = {};
-  const join_pin = String(Math.floor(100000 + Math.random() * 900000));
+  const join_pin = body.join_pin ? String(body.join_pin) : String(Math.floor(100000 + Math.random() * 900000));
   return Session.create({
     set_id: body.set_id,
     host_id: user?.user_id || user?.id || 'host1',
@@ -32,10 +32,7 @@ exports.updateById = async (id, body) => {
   return r.update(body);
 };
 
-exports.listPlayers = async (sessionId) => Player.findAll({
-  where: { session_id: sessionId },
-  order: [['id', 'ASC']]
-});
+exports.listPlayers = async (sessionId) => Player.findAll({ where: { session_id: sessionId }, order: [['id', 'ASC']] });
 
 exports.addPlayer = async (sessionId, payload) => Player.create({
   session_id: sessionId,

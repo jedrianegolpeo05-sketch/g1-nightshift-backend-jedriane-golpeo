@@ -1,0 +1,9 @@
+$kind: collection
+description: ""
+variables:
+  baseUrl: http://localhost:3001/api/v1
+  code: ""
+  setId: "1"
+  hostToken: ""
+  playerToken: ""
+  sessionId: ""

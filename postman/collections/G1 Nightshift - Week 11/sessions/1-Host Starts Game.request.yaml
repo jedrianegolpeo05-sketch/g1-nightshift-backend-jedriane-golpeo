@@ -1,0 +1,21 @@
+$kind: http-request
+url: "{{baseUrl}}/sessions"
+method: POST
+headers:
+  X-Demo-User: "{{host}}"
+  Content-Type: application/json
+body:
+  type: text
+  content: '{ "set_id": {{setId}} }'
+scripts:
+    - type: afterResponse
+    code: |-
+      pm.test("status is 201", function () {
+        pm.response.to.have.status(201);
+      });
+      const data = pm.response.json();
+      if (data.join_pin) pm.collectionVariables.set("code", data.join_pin);
+      if (data.code) pm.collectionVariables.set("code", data.code);
+      if (data.join_code) pm.collectionVariables.set("code", data.join_code);
+    language: text/javascript
+    order: 1000

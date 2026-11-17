@@ -8,6 +8,8 @@ const GENERIC_CONFLICT = {
 };
 
 function errorHandler(err, req, res, next) {
+  console.log('ERROR DEBUG:', err.name, err.parent?.constraint, err.index, err.message);
+
   const constraint = constraintOf(err);
   if (constraint) {
     const known = constraintMap[constraint] || GENERIC_CONFLICT;
@@ -20,12 +22,7 @@ function errorHandler(err, req, res, next) {
 
   if (err.name === 'SequelizeValidationError' || err.name === 'ValidationError') {
     const messages = err.errors ? err.errors.map(e => e.message).join(', ') : err.message;
-    return res.status(400).json({
-      error: {
-        code: 'VALIDATION_ERROR',
-        message: messages
-      }
-    });
+    return res.status(400).json({ error: { code: 'VALIDATION_ERROR', message: messages } });
   }
 
   const status = err.status || 500;
