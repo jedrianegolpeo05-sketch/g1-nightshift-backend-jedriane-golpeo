@@ -1,0 +1,18 @@
+$kind: http-request
+url: "{{baseUrl}}/sessions/{{code}}/players"
+method: POST
+headers:
+  Content-Type: application/json
+  X-Demo-User: "{{playerToken}}"
+body:
+  type: text
+  content: "{\r\n  \"display_name\": \"Joy\"\r\n}"
+auth:
+  type: bearer
+  credentials:
+    token: "{{playerToken}}"
+scripts:
+  - type: afterResponse
+    code: pm.test('201', function(){ pm.response.to.have.status(201); });
+    language: text/javascript
+order: 6000

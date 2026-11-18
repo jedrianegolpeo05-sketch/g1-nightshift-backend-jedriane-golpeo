@@ -1,4 +1,5 @@
 $kind: collection
+name: G1 Nightshift - Week 11
 description: ""
 variables:
   baseUrl: http://localhost:3001/api/v1

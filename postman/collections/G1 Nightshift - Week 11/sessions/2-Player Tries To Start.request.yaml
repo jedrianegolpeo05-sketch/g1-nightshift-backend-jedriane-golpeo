@@ -1,0 +1,17 @@
+$kind: http-request
+url: "{{baseUrl}}/sessions"
+method: POST
+headers:
+  X-Demo-User: "{{player}}"
+  Content-Type: application/json
+body:
+  type: text
+  content: '{ "set_id": {{setId}} }'
+scripts:
+    - type: afterResponse
+    code: |-
+      pm.test("status is 403", function () {
+        pm.response.to.have.status(403);
+      });
+    language: text/javascript
+    order: 1000

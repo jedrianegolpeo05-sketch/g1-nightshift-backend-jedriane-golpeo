@@ -57,7 +57,7 @@ exports.create = async (body, user) => {
     throw e;
   }
   const normalized = normalizeUser(user);
-  const mayUse = String(questionSet.created_by) === String(normalized.user_id) || String(questionSet.created_by) === String(normalized.id) || questionSet.is_public === true || normalized.role === 'ADMIN';
+  const mayUse = String(questionSet.created_by) === String(normalized.user_id) || String(questionSet.created_by) === String(normalized.id) || normalized.role === 'ADMIN';
   if (!mayUse) {
     const e = new Error('This question set belongs to another host.');
     e.status = 403;
@@ -65,10 +65,7 @@ exports.create = async (body, user) => {
   }
   for (let attempt = 1; attempt <= 5; attempt++) {
     try {
-      return await repo.create(
-        { set_id: body.set_id, join_pin: randomCode() },
-        normalized
-      );
+      return await repo.create({ set_id: body.set_id, join_pin: randomCode() }, normalized);
     } catch (error) {
       if (error.name === 'SequelizeUniqueConstraintError') continue;
       if (constraintOf(error) && String(constraintOf(error)).includes('join_pin')) continue;
@@ -143,20 +140,26 @@ exports.join = async (code, body, user) => {
     e.code = 'SESSION_NOT_FOUND';
     throw e;
   }
-  const rawUserId = user?.user_id ?? user?.id ?? null;
-  const userIdStr = rawUserId !== null && rawUserId !== undefined ? String(rawUserId) : null;
+  const userId = normalizeUserId(user?.user_id ?? user?.id ?? null);
+  const userIdStr = userId !== null ? String(userId) : null;
   const players = await repo.listPlayers(session.id);
+  if (userIdStr) {
+    const existing = players.find(p => {
+      const pid = p.user_id ?? p.dataValues?.user_id;
+      return pid !== null && pid !== undefined && String(pid) === userIdStr;
+    });
+    if (existing) {
+      const e = new Error('You have already joined this session.');
+      e.status = 409;
+      e.code = 'ALREADY_JOINED';
+      throw e;
+    }
+  }
   if (session.status === 'CLOSED') {
     const e = new Error('This game has ended.');
     e.status = 409;
     e.code = 'SESSION_ENDED';
     throw e;
-  }
-  if (userIdStr) {
-    const existing = players.find(p => p.user_id && String(p.user_id) === userIdStr);
-    if (existing) {
-      return { session, player: existing, rejoined: true, created: false };
-    }
   }
   if (session.status !== 'LOBBY') {
     const e = new Error('This game has already started.');
@@ -170,7 +173,11 @@ exports.join = async (code, body, user) => {
     e.code = 'SESSION_FULL';
     throw e;
   }
-  const alreadyExists = players.some(p => p.display_name.toLowerCase() === nickname.trim().toLowerCase());
+  const cleanNickname = nickname.trim().toLowerCase();
+  const alreadyExists = players.some(p => {
+    const name = p.display_name ?? p.dataValues?.display_name ?? p.name ?? p.nickname ?? '';
+    return String(name).trim().toLowerCase() === cleanNickname;
+  });
   if (alreadyExists) {
     const e = new Error('That nickname is already taken in this session.');
     e.status = 409;
@@ -178,7 +185,7 @@ exports.join = async (code, body, user) => {
     throw e;
   }
   try {
-    const player = await repo.addPlayer(session.id, { display_name: nickname.trim(), user_id: userIdStr });
+    const player = await repo.addPlayer(session.id, { display_name: nickname.trim(), user_id: userId });
     return { session, player, rejoined: false, created: true };
   } catch (error) {
     const constraint = constraintOf(error);
@@ -189,8 +196,10 @@ exports.join = async (code, body, user) => {
       throw e;
     }
     if (constraint && String(constraint).includes('user_id')) {
-      const existing = (await repo.listPlayers(session.id)).find(p => p.user_id && String(p.user_id) === userIdStr);
-      if (existing) return { session, player: existing, rejoined: true, created: false };
+      const e = new Error('You have already joined this session.');
+      e.status = 409;
+      e.code = 'ALREADY_JOINED';
+      throw e;
     }
     throw error;
   }
@@ -202,4 +211,5 @@ exports.listPlayers = async (code) => {
 };
 
 exports.start = async (code, user) => changeStatus(code, 'RUNNING', user);
+
 exports.close = async (code, user) => changeStatus(code, 'CLOSED', user);

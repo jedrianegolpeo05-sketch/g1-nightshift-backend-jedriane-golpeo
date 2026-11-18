@@ -1,0 +1,8 @@
+name: G1 Nightshift Local
+values:
+  - key: baseUrl
+    value: ''
+  - key: code
+    value: ''
+  - key: sessionId
+    value: ''

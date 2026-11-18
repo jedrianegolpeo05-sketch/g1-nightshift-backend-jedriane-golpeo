@@ -1,0 +1,22 @@
+$kind: http-request
+url: "{{baseUrl}}/sessions/{{code}}"
+method: PATCH
+headers:
+  - key: Authorization
+    value: Bearer {{hostToken}}
+    disabled: true
+  - key: Content-Type
+    value: application/json
+    disabled: false
+  - key: X-Demo-User
+    value: "{{hostToken}}"
+    disabled: false
+    description: ""
+body:
+  type: text
+  content: '   { "status": "RUNNING" }'
+scripts:
+  - type: afterResponse
+    code: pm.test('409', function(){ pm.response.to.have.status(409); });
+    language: text/javascript
+order: 12000

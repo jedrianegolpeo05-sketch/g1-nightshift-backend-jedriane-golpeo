@@ -6,7 +6,12 @@ headers:
   Content-Type: application/json
 body:
   type: text
-  content: '{ "title": "Nightshift Set {{$guid}}", "category": "Filipino", "difficulty_level": "easy" }'
+  content: |-
+    {
+     "title": "Philippine Literature",
+     "category": "Filipino",
+     "difficulty_level": "easy"
+    }
 scripts:
   - type: afterResponse
     code: |-
