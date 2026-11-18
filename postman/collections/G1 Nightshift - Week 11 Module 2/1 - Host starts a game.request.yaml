@@ -1,0 +1,38 @@
+$kind: http-request
+url: "{{baseUrl}}/sessions"
+method: POST
+headers:
+  X-Demo-User: "{{hostToken}}"
+  Content-Type: application/json
+body:
+  type: text
+  content: |-
+    {
+      "set_id": 1,
+      "hostId": 1
+    }
+scripts:
+  - type: afterResponse
+    code: |-
+      const json = pm.response.json();
+
+      if (json.join_pin) {
+        pm.collectionVariables.set("code", json.join_pin);
+        pm.environment.set("code", json.join_pin);
+      }
+
+      if (json.id) {
+        pm.collectionVariables.set("sessionId", json.id);
+        pm.environment.set("sessionId", json.id);
+      }
+
+      pm.test("Status code is 201", function () {
+        pm.response.to.have.status(201);
+      });
+
+      pm.test("Has join_pin and status LOBBY", function () {
+        pm.expect(json.join_pin).to.exist;
+        pm.expect(json.status).to.eql("LOBBY");
+      });
+    language: text/javascript
+order: 1000
