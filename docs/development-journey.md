@@ -1,6 +1,6 @@
 # Development journey: [your game title] API
 
-Student: [your name] · Section: [3-1 or 3-2] · Group: [group name]
+Student: [Jedriane Golpeo] · Section: [3-2] · Group: [Nightshift]
 
 One entry per milestone, written the week you did it. Newest at the bottom.
 
