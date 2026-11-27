@@ -76,3 +76,14 @@ SCORE - stores best night reached and total survival time
 | GET | /api/v1/question-sets/:id | Host na may-ari |
 | PATCH | /api/v1/question-sets/:id | Host na may-ari |
 | DELETE | /api/v1/question-sets/:id | Host na may-ari |
+## Demo accounts
+
+All demo users share the same password: `nightshift123`
+
+| user_id | school_id | role |
+
+|---|---|---|
+
+| host1 | SCHOOL001 | host |
+
+| player1 | SCHOOL001 | player |
