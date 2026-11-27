@@ -1,27 +1,42 @@
-const env = require('../config/env');
+// Week 12: who is calling, from the login token.
+//     Authorization: Bearer <token from POST /auth/login>
+// No header        -> req.user = null (requireUser answers 401 where a login is needed)
+// A bad token      -> 401 INVALID_TOKEN, always (forged, damaged or expired)
+// A good token     -> req.user = { user_id, school_id, role } read FRESH from the database,
+//                     so a changed role or a removed account counts at once.
+// Controllers and services still read only req.user: nothing else changed this week.
+const token = require('../security/token');
 const userRepository = require('../repositories/user.repository');
-
-if (env.nodeEnv === 'production') {
-  throw new Error('current-user.js is the Week 11 stand-in. Replace it before production.');
-}
+const { unauthorized } = require('../errors/app-error');
 
 async function currentUser(req, res, next) {
-  const schoolId = req.get('X-Demo-User');
-  if (!schoolId) {
+  const header = req.get('Authorization');
+  if (!header) {
     req.user = null;
     return next();
   }
-  if (schoolId === '2099-0002') {
-    req.user = { id: '2099-0002', user_id: '2099-0002', school_id: '2099-0002', role: 'PLAYER' };
-    return next();
+
+  const [scheme, value] = header.split(' ');
+  if (scheme !== 'Bearer' || !value) {
+    throw unauthorized('Send the header as: Authorization: Bearer <token>.', 'INVALID_TOKEN');
   }
-  if (schoolId === '2099-0003') {
-    req.user = { id: '2099-0003', user_id: '2099-0003', school_id: '2099-0003', role: 'HOST' };
-    return next();
+
+  let payload;
+  try {
+    payload = token.verify(value);
+  } catch (error) {
+    const message = error.name === 'TokenExpiredError'
+      ? 'Your login has expired. Log in again.'
+      : 'This token is not valid. Log in again.';
+    throw unauthorized(message, 'INVALID_TOKEN');
   }
-  let user = await userRepository.findBySchoolId(schoolId);
-  req.user = user ? { id: user.user_id, user_id: user.user_id, school_id: user.school_id, role: user.role } : null;
-  next();
+
+  const account = await userRepository.findById(Number(payload.sub));
+  if (!account) throw unauthorized('This account no longer exists.', 'INVALID_TOKEN');
+
+  req.account = account;                 // the full account, for GET /auth/me
+  req.user = { user_id: account.user_id, school_id: account.school_id, role: account.role };
+  return next();
 }
 
 module.exports = currentUser;

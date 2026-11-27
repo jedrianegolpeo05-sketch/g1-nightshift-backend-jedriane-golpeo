@@ -66,3 +66,13 @@ SCORE - stores best night reached and total survival time
 | npm run db:check | Counts the rows in every table |
 | npm run db:reset | Empties the database, rebuilds every table and reloads the seed data |
 | npm run check | Runs the same automatic check that GitHub runs after every push |
+
+## Week 11 - Question Sets
+
+| Method | URL | Sino pwede |
+|---|---|---|
+| POST | /api/v1/question-sets | Host |
+| GET | /api/v1/question-sets | Host |
+| GET | /api/v1/question-sets/:id | Host na may-ari |
+| PATCH | /api/v1/question-sets/:id | Host na may-ari |
+| DELETE | /api/v1/question-sets/:id | Host na may-ari |
